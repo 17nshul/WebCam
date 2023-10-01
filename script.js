@@ -5,6 +5,8 @@ let captureBtnCont = document.querySelector(".capture-btn-cont");
 let captureBtn = document.querySelector(".capture-btn");
 let recordFlag = false;
 
+let transparentColor = "transparent";
+
 let recorder;
 let chunks = []; //media data in chunks
 
@@ -53,6 +55,25 @@ recordBtnCont.addEventListener("click", (e) => {
   }
 });
 
+captureBtnCont.addEventListener("click", (e) => {
+  let canvas = document.createElement("canvas");
+  canvas.height = video.videoHeight;
+  canvas.width = video.videoWidth;
+
+  let tool = canvas.getContext("2d");
+  tool.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  //filtering
+  tool.fillStyle = transparentColor;
+  tool.fillRect(0, 0, canvas.width, canvas.height);
+
+  let imageURL = canvas.toDataURL();
+  let a = document.createElement("a");
+  a.href = imageURL;
+  a.download = "image.jpg";
+  a.click();
+});
+
 let timerId;
 let counter = 0; //represents total seconds
 let timer = document.querySelector(".timer");
@@ -81,3 +102,14 @@ function stopTimer() {
   timer.insertText = "00:00:00";
   timer.style.display = "none";
 }
+
+//filter logic
+let filterLayer = document.querySelector(".filter-layer");
+let allFilter = document.querySelectorAll(".filter");
+allFilter.forEach((filterElem) => {
+  filterElem.addEventListener("click", (e) => {
+    transparentColor =
+      getComputedStyle(filterElem).getPropertyValue("background-color");
+    filterLayer.style.backgroundColor = transparentColor;
+  });
+});
